@@ -1,3 +1,12 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#   Tetris: pieceGen.h
+#
+#   Implementation of 3 peice generation algorithms for easy, medium, and
+#   hard difficulties.
+#-----------------------------------------------*/
+
 #ifndef __PIECE_GEN_H
 #define __PIECE_GEN_H
 

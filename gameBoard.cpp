@@ -1,3 +1,10 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#   Tetris: gameBoard.cpp
+#
+#-----------------------------------------------*/
+
 #include "gameBoard.h"
 
 using namespace std;
@@ -17,10 +24,13 @@ gameBoard::gameBoard() {
     }
   }
 }
-
+// Checks a stores if/which lines are filled. Only checks the lines that
+// could possibly have been filled based of where the previous piece just
+// finished. Returns the number of lines filled from 0-4.
 int gameBoard::checkLines(int (*lines)[2][4]) {
   bool filled;
   int redraw = 0;
+  // loops through all spaces looking for an unfilled square
   for (int i = 0; i < 4; i++) {
     filled = true;
     for (int j = 0; j < 10; j++) {
@@ -31,6 +41,7 @@ int gameBoard::checkLines(int (*lines)[2][4]) {
       }
     }
   }
+  // sets the filled array for the filled lines
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {
       if (((*lines)[1][i] == (*lines)[1][j]) && ((*lines)[0][j] == 1) &&
@@ -39,6 +50,7 @@ int gameBoard::checkLines(int (*lines)[2][4]) {
       }
     }
   }
+  // sets the number of lines filled before returning
   for (int i = 0; i < 4; i++) {
     if ((*lines)[0][i]) {
       redraw++;
@@ -48,6 +60,8 @@ int gameBoard::checkLines(int (*lines)[2][4]) {
   return redraw;
 }
 
+// Erases the filled lines, shifts board down and reprints all lines above the
+// one which was filled. Does not reprint whole board to save time.
 void gameBoard::rePrintBoardAbove(int (*lines)[2][4], int redraw,
 Adafruit_ILI9341 tft) {
 
@@ -88,7 +102,7 @@ Adafruit_ILI9341 tft) {
     }
     // set to 100 so we dont do that line again
     ys[ind] = 100;
-
+    // adjusts the gameboard values
     for (int i = l; i >= lowestY; i--) {
       for (int j = 0; j < 10; j++) {
         this->board[j][i] = space(this->board[j][i-1].filled, j, i,
@@ -317,6 +331,7 @@ void gameBoard::contour(int (*checks)[8]) {
   }
 }
 
+// method to print the empy gameboard by drawing a series of lines plus text
 void gameBoard::printBoard(Adafruit_ILI9341 tft) {
   // Prints the empty board
   int x0, y0, x1, y1;
@@ -343,6 +358,10 @@ void gameBoard::printBoard(Adafruit_ILI9341 tft) {
 
 }
 
+// method to shift a piece left, right, or down. Calls other methods to
+// check if the shift is valid, update the board, update the piece, and
+// redraw the board accordingly. Returns a bool that is true if the shift
+// was executed
 int gameBoard::shift(int shift, piece &currentPiece, Adafruit_ILI9341 tft) {
   // 1 means can move, 0 for hitting side, -1 for hitting another
   // block or the bottom
@@ -356,13 +375,17 @@ int gameBoard::shift(int shift, piece &currentPiece, Adafruit_ILI9341 tft) {
   return ok;
 }
 
+// Method to drop a piece to the lowest possible place directly below it.
 void gameBoard::drop(piece &p, Adafruit_ILI9341 tft) {
   bool bottom = false;
   int shift = 0;
   for (int i = 0; i < 4; i++) {
+    // sets the old location to empty
     this->board[p.squares[i].xB]
     [p.squares[i].yB].filled = 0;
   }
+  // Searches for the lowest unfilled spot where the piece will fit
+  // Increments a shift variable each time we move down a row
   while (!bottom) {
     shift++;
     for (int i = 0; i < 4; i++) {
@@ -371,29 +394,35 @@ void gameBoard::drop(piece &p, Adafruit_ILI9341 tft) {
       (p.squares[i].yB + shift > 23)) {
         bottom = true;
         shift -= 1;
+        // breaks when we hit a filled square or the bottom
         break;
       }
     }
   }
   if ((shift) != 0) {
+    // lets the the new location on the board
     for (int i = 0; i < 4; i++) {
       this->board[p.squares[i].xB][p.squares[i].yB + shift].filled = 1;
       this->board[p.squares[i].xB][p.squares[i].yB + shift].colour =
       p.colour;
       if (p.squares[i].yB >= 4) {
+        // draws over the old piece
         tft.fillRect(p.squares[i].xD, p.squares[i].yD, 21, 13, colours::BLACK);
       }
     }
     for (int i = 0; i < 4; i++) {
       if ((p.squares[i].yB + shift) >= 4) {
+        // draws the new piece
         tft.fillRect(this->board[p.squares[i].xB][p.squares[i].yB].xD,
           this->board[p.squares[i].xB][p.squares[i].yB + shift].yD, 21, 13,
           this->board[p.squares[i].xB][p.squares[i].yB + shift].colour);
+          // increments the board location stored within the piece variable
         p.squares[i].yB += shift;
       }
     }
   } else {
     for (int i = 0; i < 4; i++) {
+      // resets the old board to filled if we didn't move
       this->board[p.squares[i].xB]
       [p.squares[i].yB].filled = 1;
     }
@@ -415,30 +444,37 @@ gameBoard::piece gameBoard::spawnPiece(int pID, Adafruit_ILI9341 tft) {
   // different pID's determine which one spawns
   int x1, x2, x3, x4, y1, y2, y3, y4, colour;
   if (pID == 1) {
+    // straight blue piece
     x1 = x2 = x3 = x4 = 4;
     y1 = 0; y2 = 1; y3 = 2; y4 = 3;
     colour = colours::CYAN;
   } else if (pID == 2) {
+    // Backwards L piece
     x1 = x2 = x3 = 5; x4 = 4;
     y1 = 0; y2 = 1; y3 = 2; y4 = 2;
     colour = colours::VIOLET;
   } else if (pID == 3) {
+    // L piece
     x1 = x2 = x3 = 4; x4 = 5;
     y1 = 0; y2 = 1; y3 = 2; y4 = 2;
     colour = colours::ORANGE;
   } else if (pID == 4) {
+    // Square piece
     x1 = x2 = 3; x3 = x4 = 4;
     y2 = y4 = 0; y1 = y3 = 1;
     colour = colours::YELLOW;
   } else if (pID == 5) {
+    // Z piece #1
     x1 = 4; x2 = 4; x3 = 5; x4 = 5;
     y1 = 0; y2 = y3 = 1; y4 = 2;
     colour = colours::LIME;
   } else if (pID == 6) {
+    // T piece
     x1 = 3; x2 = x3 = 4; x4 = 5;
     y1 = y2 = y4 = 1; y3 = 0;
     colour = colours::PINKK;
   } else if (pID == 7) {
+    // Z piece #2
     x1 = x2 = 4; x3 = x4 = 5;
     y1 = 2; y2 = y3 = 1; y4 = 0;
     colour = colours::RED;
@@ -456,7 +492,7 @@ void gameBoard::piece::updatePiece(int shift, Adafruit_ILI9341 tft) {
     xS = -1; yS = 0;
   } else if (shift == 1) {
     xS = 1; yS = 0;
-  } else { // shift = 2
+  } else { // shift == 2 is the only other case
     xS = 0; yS = 1;
   }
   for (int i = 0; i < 4; i++) {
@@ -481,8 +517,6 @@ void gameBoard::piece::updatePiece(int shift, Adafruit_ILI9341 tft) {
     for (int j = 0; j < 4; j++) {
       // checks if any of the old squares are still in the new one, in which
       // case we dont have to erase and redraw the whole block
-      // NOTE: move draw piece in here and only draw the squares which
-      // werent in the old place
       if ((oldX[i] == newX[j]) && (oldY[i] == newY[j])) {
         break;
       } else {
@@ -532,6 +566,7 @@ void gameBoard::displayBoard() {
     for (int j = 0; j < 10; j++) {
       Serial.print(this->board[j][i].xB); Serial.print(" ");
       Serial.print(this->board[j][i].yB); Serial.print(" ");
+      // Uncomment below to print square info for each space (LOTS of text)
       //Serial.print(this->board[j][i].xD); Serial.print(" ");
       //Serial.print(this->board[j][i].yD); Serial.println(" ");
       //Serial.print(this->board[j][i].colour); Serial.print(" ");
@@ -620,6 +655,8 @@ gameBoard::space::space(bool filled, int xB, int yB, int colour) {
 
 gameBoard::space::space() {}
 
+// Constructor for piece, includes piece ID (see spawn piece method),
+// 4 squares of this piece, colour, and current orientation
 gameBoard::piece::piece(int pID, space s0, space s1, space s2, space s3,
 int colour, int currentRotation) {
   this->pID = pID;

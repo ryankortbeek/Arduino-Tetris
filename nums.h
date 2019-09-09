@@ -1,3 +1,12 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#   Tetris: nums.h
+#
+#   Holds all constants and pin numbers
+#
+#-----------------------------------------------*/
+
 #ifndef __NUMS_H
 #define __NUMS_H
 

@@ -1,3 +1,14 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#
+#   Tetris: gameBoard.h
+#
+#   Contains the data structures used to represent the virtual gameboard,
+#   squares, and pieces, as well as the various movement and rotation methods.
+#   Also has functions for analyzing the current boardstate to tell the
+#   functions in piecegen.
+#-----------------------------------------------*/
 #ifndef __GAME_BOARD_H
 #define __GAME_BOARD_H
 
@@ -17,6 +28,7 @@ public:
     xB and yB are the column and row location on the gameboard of the
     space where as xD and yD are the x and y cordinates of the top left corner
     of this space on the display
+    --> Possible colorus a defined within nums.h file
     */
     bool filled;
     int xB, yB, xD, yD, colour;
@@ -67,20 +79,22 @@ public:
 
   gameBoard::piece spawnPiece(int pID, Adafruit_ILI9341 tft);
 
-  // Analyzes the countour of the board to determine what piece to give
-  // next
+  // Analyzes the countour of the board to be used by niceTris or bustHead
+  // algorithms in determining what piece to give next
   void contour(int (*checks)[8]);
-
+  // Implementation of niceTris algorithm which takes contour analysis of
+  // current board state and attempts to give player the best piece for their
+  // situation.
   int niceTris(int (*insertPieces)[7][2], int (*checks)[8]);
-
+  // Implementation of bustHead algoirthm which takes contour analysis of
+  // current board state and attempts to give player the worst piece for their
+  // situation
   int bustHead(int (*insertPieces)[7][2], int (*checks)[8], int prevP);
-
   // Checks if lines given in array were filled
   // makes line a [2][4] array where [0][y] is a true false for wether not
   // this line is to be checked (initially), then checlines changes it
   // to 1 if that line is filled; [1][y] is the line number
   int checkLines(int (*lines)[2][4]);
-
   // Cuts out the lines which were filled and shifts all the above lines down
   // should check how many lines are to be erased, then erase all those lines
   // and fix all the board space variables, then re draw the blocks shifted

@@ -1,3 +1,12 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#
+#   Tetris: play.h
+#
+#   Header file for play.cpp
+#
+#-----------------------------------------------*/
 #ifndef __CONSTS_AND_TYPES_H
 #define __CONSTS_AND_TYPES_H
 

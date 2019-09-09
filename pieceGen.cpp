@@ -1,3 +1,10 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#   Tetris: pieceGen.cpp
+# 
+#-----------------------------------------------*/
+
 #include "pieceGen.h"
 
 void pieceGenerator::Bag::refillBag() {

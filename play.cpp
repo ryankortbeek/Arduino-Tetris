@@ -1,3 +1,14 @@
+/*------------------------------------------------
+#   Name: Justin Boileau, Ryan Kortbeek
+#
+#
+#   Tetris: play.cpp
+#
+#   Main file for game to be run from, contains functions for interacting
+#   with the device hardware as well as the main program flow.
+#
+#-----------------------------------------------*/
+
 #include "play.h"
 
 void setup() {
@@ -72,6 +83,7 @@ int play(int diff) {
   Adafruit_ILI9341 tft = Adafruit_ILI9341(pins::TFT_CS, pins::TFT_DC);
   gameBoard gb = gameBoard();
   gb.printBoard(tft);
+  // Initializes variables
   bool gameOver = false;
   int redraw = 0;
   int pID = 1;
@@ -185,8 +197,6 @@ int play(int diff) {
         }
       }
       pID = vBag.grab();
-      // Serial.print("Grabbed: "); Serial.print(pID); Serial.print(" New size: "); Serial.print(vBag.size); Serial.println(" New Bag:");
-      // vBag.printBag();
     }
 
     // Spawns the piece in the area above the board (invisible to player)
@@ -265,6 +275,7 @@ int chgDiff(int diff, int change) {
   return diff;
 }
 
+// Deletes old score and prints new one
 void printDiff(int diff, Adafruit_ILI9341 tft) {
   tft.fillRect(140, 148, 100, 25, colours::BLACK);
   tft.setCursor(140, 150);
@@ -311,6 +322,8 @@ void printDiff(int diff, Adafruit_ILI9341 tft) {
   }
 }
 
+// Prints main menu display, waits for player to select difficulty and then
+// returns it
 int mainMenu(Adafruit_ILI9341 tft) {
   // max/min joystick values
   int highBound = ard_consts::JOY_CENTER + ard_consts::JOY_DEADZONE;
@@ -377,11 +390,8 @@ int mainMenu(Adafruit_ILI9341 tft) {
   tft.fillScreen(colours::BLACK);
   return diff;
 }
-
+// Prints "Game Over" one letter at a time
 void gameOver(Adafruit_ILI9341 tft, unsigned long score) {
-  // print score and whatever else ya want
-  // could try printint game over in colours like the tetris title
-  // game over would probably have to be cenetered on two seperate lines
   tft.fillScreen(colours::BLACK);
   uint16_t cols[6] = {colours::RED, colours::ORANGE, colours::YELLOW,
     colours::LIME, colours::CYAN, colours::VIOLET};
@@ -409,15 +419,18 @@ void gameOver(Adafruit_ILI9341 tft, unsigned long score) {
 }
 
 int main() {
+  // Calls setup to initialize arduino
   setup();
+  // Initializes tft display
   Adafruit_ILI9341 tft = Adafruit_ILI9341(pins::TFT_CS, pins::TFT_DC);
   while (true) {
+    // Calls main menu function which will print and wait for the user to
+    // select a difficulty
     int diff = mainMenu(tft);
+    // Calls play function to play a tetris game at selected difficulty.
+    // Returns the players score
     unsigned long score = play(diff);
+    // Prints game over when the game ends and displays score.
     gameOver(tft, score);
   }
-  Serial.end();
-  Serial.begin(9600);
-  Serial.println("Done");
-  tft.fillScreen(colours::RED);
 }
